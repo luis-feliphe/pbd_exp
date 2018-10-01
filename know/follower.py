@@ -61,7 +61,8 @@ angle = 0
 MIN_DIST = 70
 #it will follow objects in this gap Min|Max
 MAX_DIST = 200
-
+global cont
+cont =0
 
 def get_button():
 	pass
@@ -76,7 +77,6 @@ def get_scan(scan):
 	for i in range (0,len(temp)):
 		temp[i] = round (temp[i] * 100,1)
 	distance = min(temp)
-	print (distance)
 	angle = temp.index(distance)
 
 def degrees(value):
@@ -84,7 +84,11 @@ def degrees(value):
 
 def get_pos(odom):
 	global posicao
-	posicao.append(getxy(odom))
+	global cont
+	cont +=1
+	if cont %10 == 0:
+		posicao.append(getxy(odom))
+		print str (getxy(odom))
 
 
 
@@ -144,7 +148,7 @@ try:
 		if distance!=None and distance < MAX_DIST:
 			v.angular.z = ((angle-320)/320.0)
 			v.linear.x = tanh (5 * (distance - MIN_DIST)) * MAX_LIN
-		if abs (v.linear.x)< 0.02:
+		if v.linear.x < 0.01:
 			v.linear.x = 0
 		p.publish (v)
 		
