@@ -74,6 +74,7 @@ global button_state
 button_state = 0
 
 def handle_buttons(bt):
+	global button_state
 	if bt.state == 1:
 		button_state +=1
 
@@ -108,7 +109,7 @@ def gen_new_behavior():
 	model = file.readlines()
 	file.close()
 	header = gen_header()
-	for i in range (1,8):
+	for i in range (0,8):
 		model[i+1]=header[i] 
 	model[96]= "points = " + handle_positions() + "\n"
 	file = open ("./know/generated_behavior"+str(cont_gen)+".py", "wb")
@@ -139,7 +140,6 @@ def get_pos(odom):
 	global posicao_cont
 	posicao_cont +=1
 	if posicao_cont>40:
-		print str (posicao_cont) + " " + str (len (posicao))
 		posicao_cont = 0
 		posicao.append(getxy(odom))
 
@@ -177,6 +177,8 @@ else: # real robots
 	rospy.Subscriber("/robot_0/scan", LaserScan, get_scan)
 	rospy.Subscriber("/robot_0/mobile_base/events/button", ButtonEvent, handle_buttons)
 	p = rospy.Publisher("/robot_0/cmd_vel_mux/input/teleop", Twist)
+	f = rospy.Publisher("/finish_f", String)
+	w = rospy.Publisher("/working", String)
 #	rospy.Subscriber("robot_0/mobile_base/events/button", String, get_button)
 	psound = rospy.Publisher("/robot_0/mobile_base/commands/sound", Sound)
 
@@ -190,7 +192,7 @@ teste = 0
 try:
 	while not rospy.is_shutdown():#button:
 		global button_state
-		if button_state == 1
+		if button_state >= 1:
 			teste +=1
 			#starts to follow 
 			v = Twist()
@@ -207,6 +209,11 @@ try:
 			if button_state >2:
 				print "Gerando novo comportamento"
 				gen_new_behavior()
+				f.publish("foi")
+				r.sleep()
+				w.publish(True)
+				r.sleep()
+				print "new behavior generated sucessfully"
 				sys.exit()
 		
 	r.sleep()

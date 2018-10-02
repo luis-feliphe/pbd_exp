@@ -78,10 +78,10 @@ myId = sys.argv[1].replace("robot_", "")
 
 
 robot = sys.argv[1]#,sys.argv[2],sys.argv[3], sys.argv[4]
-rospy.init_node(str(robot)+"_gotoE")
-rospy.Subscriber(robot+"/odom", Odometry, getpos)
-finish = rospy.Publisher(robot+"/working", Bool)
-p = rospy.Publisher(robot+"/cmd_vel_mux/input/teleop", Twist)
+rospy.init_node(str(robot)+"_generated")
+rospy.Subscriber("/"+robot+"/odom", Odometry, getpos)
+finish = rospy.Publisher("/"+robot+"/working", Bool)
+p = rospy.Publisher("/"+robot+"/cmd_vel_mux/input/teleop", Twist)
 
 r = rospy.Rate(RATE) # 5hz
 
@@ -98,7 +98,7 @@ points = [(-u ,u)]
 cont = 0
 posInicialx=0
 posInicialy=0
-
+print "Iniciou essa poxa!"
 
 
 iteracoes = 1.0
@@ -109,7 +109,7 @@ try:
 		if hasDataToWalk():
 			x, y , mx, my, mz = getDataFromRos()
 			t= Twist()
-			x, y = points[cont]
+			x, y, z = points[cont]
 			lin,ang  = algoritmo.start(str(myId),x, y, mx, my, mz)
 			if (lin == 0 and ang == 0):
 				cont= (cont + 1)%len (points)

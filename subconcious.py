@@ -75,7 +75,7 @@ class Subconcious:
 		self.finish = rospy.Publisher(sys.argv[1]+ "/working" , Bool)
 
 		rospy.Subscriber ("/knowledge", String, self.receive_knowledge)
-		rospy.Subscriber ("/box", String, self.isbox)
+		rospy.Subscriber ("/finish_f", String, self.isbox)
 		rospy.Subscriber ("/ask_knowledge", String, self.handle_requests)
 		rospy.Subscriber (sys.argv[1] + "/working", Bool, self.worker_process)
 
@@ -121,9 +121,12 @@ class Subconcious:
 			cont += 1
 			if not self.working:
 				if (self.rule == 1):
-					self.run("follower")
-					self.knowlege = []
-					self.learn_from_file()
+					if not box:
+						self.run("follower")
+					else:
+						print "entrou"
+						self.learn_from_file()
+						self.share_knowledge ("generated1")
 				elif (self.rule == 2):
 					self.run ("generated1")
 				elif (self.rule==3):
@@ -149,7 +152,7 @@ class Subconcious:
 			#Treino o que aprendi (faco alguma coisa
 
 	def worker_process (self, value):
-		#print "Working" + str (value)
+		print "Working" + str (value)
 		self.working  = False 
 
 	def organize_args (self, task):
@@ -208,6 +211,7 @@ class Subconcious:
 
 
 	def learn_from_file(self):
+		self.knowledge = []
 		''' It search for knowledge in directory, if exists it is loaded - Procura conhecimentos no diretório, se existir são carregados'''
 		log ("charging knowledge from files")
 		import glob
@@ -236,7 +240,9 @@ class Subconcious:
 			self.knowledge.append(know)
 
 	def isbox(self, knowledge):
+		print "Recebeu"
 		global box
+		self.working = False
 		box = True
 	def receive_knowledge(self, knowledge):
 		''' Callback: It receives knowledges from topic and save it in files - Recebe conhecimento e o salva em arquivos'''
@@ -284,6 +290,7 @@ class Subconcious:
 	def share_knowledge(self, know):
 		''' You decide send knowledge to comunity'''
 #		log ("I decided share knowledge with my team")
+		print "compartilhando comportamento " + str (know)
 		temp = None
 		resp= ""
 		if len (self.knowledge) == 0: 
