@@ -52,7 +52,7 @@ class Subconcious:
 #			os.system("rm ./know/follower.py")
 #			os.system("rm ./know/patrol.py")
 #			os.system("rm ./know/gotoxy.py")
-#			os.system("rm ./know/Controlo.py")
+			os.system("rm ./know/*")
 		#if Im robot 3
 		elif sys.argv[1].count ("2")>0:
 			self.rule = 3
@@ -122,8 +122,10 @@ class Subconcious:
 			if not self.working:
 				if (self.rule == 1):
 					self.run("follower")
+					self.knowlege = []
+					self.learn_from_file()
 				elif (self.rule == 2):
-					self.run ("follower")
+					self.run ("generated1")
 				elif (self.rule==3):
 					self.run ("gotoxy")
 				#if len (self.shared_knowledge ) <= len (self.knowledge):

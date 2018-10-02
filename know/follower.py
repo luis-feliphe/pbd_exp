@@ -32,6 +32,7 @@ import time
 from math import tanh
 #extra
 from kobuki_msgs.msg import Sound
+from kobuki_msgs.msg import ButtonEvent
 from kobuki_msgs.msg import Led
 ####
 from tf.transformations import euler_from_quaternion
@@ -45,8 +46,8 @@ import math
 RATE = 10
 
 #real turtlebot
-MAX_LIN = 0.1
-MAX_ANG = 0.75
+MAX_LIN = 0.15
+MAX_ANG = 0.85
 #simulated  turtlebot
 #MAX_LIN = 0.6
 #MAX_ANG = 0.5
@@ -68,6 +69,13 @@ global cont_gen
 cont_gen = 0
 global posicao_cont
 posicao_cont =0
+
+global button_state
+button_state = 0
+
+def handle_buttons(bt):
+	if bt.state == 1:
+		button_state +=1
 
 def gen_header():
 	global cont_gen
@@ -167,6 +175,7 @@ if False: #simulated robots
 else: # real robots
 	rospy.Subscriber("/robot_0/odom", Odometry, get_pos)
 	rospy.Subscriber("/robot_0/scan", LaserScan, get_scan)
+	rospy.Subscriber("/robot_0/mobile_base/events/button", ButtonEvent, handle_buttons)
 	p = rospy.Publisher("/robot_0/cmd_vel_mux/input/teleop", Twist)
 #	rospy.Subscriber("robot_0/mobile_base/events/button", String, get_button)
 	psound = rospy.Publisher("/robot_0/mobile_base/commands/sound", Sound)
@@ -180,23 +189,25 @@ button = True
 teste = 0
 try:
 	while not rospy.is_shutdown():#button:
-		teste +=1
-		#starts to follow 
-		v = Twist()
-		v.linear.x = 0
-		v.angular.z = 0
-		global distance
-		global angle
-		if distance!=None and distance < MAX_DIST:
-			v.angular.z = ((angle-320)/320.0)
-			v.linear.x = tanh (5 * (distance - MIN_DIST)) * MAX_LIN
-		if abs(v.linear.x) < 0.01:
+		global button_state
+		if button_state == 1
+			teste +=1
+			#starts to follow 
+			v = Twist()
 			v.linear.x = 0
-		p.publish (v)
-		if len (posicao) > 30:
-			print "Gerando novo comportamento"
-			gen_new_behavior()
-			sys.exit()
+			v.angular.z = 0
+			global distance
+			global angle
+			if distance!=None and distance < MAX_DIST:
+				v.angular.z = ((angle-320)/320.0)
+				v.linear.x = tanh (5 * (distance - MIN_DIST)) * MAX_LIN
+			if abs(v.linear.x) < 0.01:
+				v.linear.x = 0
+			p.publish (v)
+			if button_state >2:
+				print "Gerando novo comportamento"
+				gen_new_behavior()
+				sys.exit()
 		
 	r.sleep()
 
