@@ -42,26 +42,26 @@ class Subconcious:
 		#if im robot 1
 		if sys.argv[1].count ("0")>0:
 			self.rule = 1
-			print "Im robot 1"
-			os.system("rm ./know/take_photo.py")
+#			print "Im robot 1"
+#			os.system("rm ./know/take_photo.py")
 		#if Im robot 2
 		elif sys.argv[1].count ("1")>0:
 			print "Im robot 2"
 			self.rule = 2
-			os.system("rm ./know/take_photo.py")
-			os.system("rm ./know/follower.py")
-			os.system("rm ./know/patrol.py")
-			os.system("rm ./know/gotoxy.py")
-			os.system("rm ./know/Controlo.py")
+#			os.system("rm ./know/take_photo.py")
+#			os.system("rm ./know/follower.py")
+#			os.system("rm ./know/patrol.py")
+#			os.system("rm ./know/gotoxy.py")
+#			os.system("rm ./know/Controlo.py")
 		#if Im robot 3
 		elif sys.argv[1].count ("2")>0:
 			self.rule = 3
 			print "Im robot 3"
-			os.system("rm ./know/Controlo.py")
-			os.system("rm ./know/gotoxy.py")
-			os.system("rm ./know/patrol.py")
-			os.system("rm ./know/follower.py")
-			os.system("rm ./know/move_around.py")
+#			os.system("rm ./know/Controlo.py")
+#			os.system("rm ./know/gotoxy.py")
+#			os.system("rm ./know/patrol.py")
+#			os.system("rm ./know/follower.py")
+#			os.system("rm ./know/move_around.py")
 
 		#variables
 		self.working = False
@@ -121,10 +121,7 @@ class Subconcious:
 			cont += 1
 			if not self.working:
 				if (self.rule == 1):
-					global box
-					if box:
-						self.run("move_around")
-					self.run ("patrol")
+					self.run("follower")
 				elif (self.rule == 2):
 					self.run ("follower")
 				elif (self.rule==3):

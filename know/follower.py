@@ -48,8 +48,8 @@ RATE = 10
 MAX_LIN = 0.1
 MAX_ANG = 0.75
 #simulated  turtlebot
-MAX_LIN = 0.6
-MAX_ANG = 0.5
+#MAX_LIN = 0.6
+#MAX_ANG = 0.5
 
 global posicao
 posicao = []
@@ -66,7 +66,8 @@ cont =0
 
 global cont_gen
 cont_gen = 0
-
+global posicao_cont
+posicao_cont =0
 
 def gen_header():
 	global cont_gen
@@ -95,14 +96,14 @@ def handle_positions():
 	
 def gen_new_behavior():
 	global cont_gen
-	file = open ("model.py", "r")
+	file = open ("./know/model.py", "r")
 	model = file.readlines()
 	file.close()
 	header = gen_header()
 	for i in range (1,8):
 		model[i+1]=header[i] 
 	model[96]= "points = " + handle_positions() + "\n"
-	file = open ("./generated_behavior"+str(cont_gen)+".py", "wb")
+	file = open ("./know/generated_behavior"+str(cont_gen)+".py", "wb")
 	for i in model:
 		file.write(i)
 	file.close()
@@ -127,7 +128,11 @@ def degrees(value):
 
 def get_pos(odom):
 	global posicao
-	if len(posicao)%5:
+	global posicao_cont
+	posicao_cont +=1
+	if posicao_cont>40:
+		print str (posicao_cont) + " " + str (len (posicao))
+		posicao_cont = 0
 		posicao.append(getxy(odom))
 
 def getDegreesFromOdom(w):
@@ -185,12 +190,13 @@ try:
 		if distance!=None and distance < MAX_DIST:
 			v.angular.z = ((angle-320)/320.0)
 			v.linear.x = tanh (5 * (distance - MIN_DIST)) * MAX_LIN
-		if v.linear.x < 0.01:
+		if abs(v.linear.x) < 0.01:
 			v.linear.x = 0
 		p.publish (v)
-		if len (posicao) == 1000:
+		if len (posicao) > 30:
 			print "Gerando novo comportamento"
 			gen_new_behavior()
+			sys.exit()
 		
 	r.sleep()
 
