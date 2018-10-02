@@ -42,7 +42,7 @@ from sensor_msgs.msg import LaserScan
 getTime = lambda: int(round(time.time() * 1000))
 
 import math
-RATE = 1 
+RATE = 10
 
 #real turtlebot
 MAX_LIN = 0.1
@@ -64,6 +64,49 @@ MAX_DIST = 200
 global cont
 cont =0
 
+global cont_gen
+cont_gen = 0
+
+
+def gen_header():
+	global cont_gen
+	cont_gen+=1
+	header = []
+	header.append("#generated" + str (cont_gen)+"\n")
+	header.append("#cmd_vel, base_pose_ground_truth"+"\n")
+	header.append("#This is a generated model for turtlebot"+"\n")
+	header.append("#turtlebot"+"\n")
+	header.append("#./know/generated_behavior"+str(cont_gen)+".py"+"\n")
+	header.append("#name"+"\n")
+	header.append("#controlo"+"\n")
+	header.append("#active"+"\n")
+	return header
+def handle_positions():
+	global posicao
+	value = "["
+	for i in range (len (posicao)):
+		if i == len (posicao)-1:
+			value+= str(posicao[i])
+		else:
+			value+= str(posicao[i])+","
+	value +="]"
+	posicao = []
+	return value
+	
+def gen_new_behavior():
+	global cont_gen
+	file = open ("model.py", "r")
+	model = file.readlines()
+	file.close()
+	header = gen_header()
+	for i in range (1,8):
+		model[i+1]=header[i] 
+	model[96]= "points = " + handle_positions() + "\n"
+	file = open ("./generated_behavior"+str(cont_gen)+".py", "wb")
+	for i in model:
+		file.write(i)
+	file.close()
+
 def get_button():
 	pass
 
@@ -84,13 +127,8 @@ def degrees(value):
 
 def get_pos(odom):
 	global posicao
-	global cont
-	cont +=1
-	if cont %10 == 0:
+	if len(posicao)%5:
 		posicao.append(getxy(odom))
-		print str (getxy(odom))
-
-
 
 def getDegreesFromOdom(w):
 	#TODO: HOW CONVERT DATA TO ANGLES
@@ -117,7 +155,7 @@ rospy.init_node("robot_"+str(robot)+"_folower")
 finish = None
 p = None
 
-if True: #simulated robots
+if False: #simulated robots
 	rospy.Subscriber("/robot_0/odom", Odometry, get_pos)
 	rospy.Subscriber("/robot_0/base_scan", LaserScan, get_scan)
 	p = rospy.Publisher("/robot_0/cmd_vel", Twist)
@@ -132,13 +170,12 @@ else: # real robots
 r = rospy.Rate(RATE) # 5hz
 
 print "Iniciado o follower"
-#### Iniciando o loop principal ######
 tempoInicial = getTime()
 button = True
-
-#############################
+teste = 0
 try:
-	while button:
+	while not rospy.is_shutdown():#button:
+		teste +=1
 		#starts to follow 
 		v = Twist()
 		v.linear.x = 0
@@ -151,6 +188,9 @@ try:
 		if v.linear.x < 0.01:
 			v.linear.x = 0
 		p.publish (v)
+		if len (posicao) == 1000:
+			print "Gerando novo comportamento"
+			gen_new_behavior()
 		
 	r.sleep()
 
