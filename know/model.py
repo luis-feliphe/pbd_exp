@@ -110,7 +110,7 @@ try:
 			x, y , mx, my, mz = getDataFromRos()
 			t= Twist()
 			x, y, z = points[cont]
-			lin,ang  = algoritmo.start(str(myId),x, y, mx, my, mz)
+			lin,ang  = algoritmo.start(x, y, z, mx, my, mz)
 			if (lin == 0 and ang == 0):
 				cont= (cont + 1)%len (points)
 				if (cont == 0):

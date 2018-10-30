@@ -200,9 +200,13 @@ try:
 			v.angular.z = 0
 			global distance
 			global angle
-			if distance!=None and distance < MAX_DIST:
+			if distance!=None and distance < MAX_DIST and (distance < MIN_DIST -5 or distance > MIN_DIST + 5):
+#			print ("Distancia " + str (MAX_DIST-5) + " " + str (distance) + " "+ str(MAX_DIST + 5) )
+#			if distance!=None and not ( distance > MAX_DIST- 5 or distance < MAX_DIST +5):
 				v.angular.z = ((angle-320)/320.0)
 				v.linear.x = tanh (5 * (distance - MIN_DIST)) * MAX_LIN
+			else:
+				v.linear.x = 0
 			if abs(v.linear.x) < 0.01:
 				v.linear.x = 0
 			p.publish (v)
