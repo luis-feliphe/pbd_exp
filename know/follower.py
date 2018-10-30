@@ -41,7 +41,7 @@ import struct
 from datetime import datetime
 from sensor_msgs.msg import LaserScan
 getTime = lambda: int(round(time.time() * 1000))
-
+import thread
 import math
 RATE = 10
 
@@ -77,6 +77,27 @@ def handle_buttons(bt):
 	global button_state
 	if bt.state == 1:
 		button_state +=1
+
+def handle_joy():
+	import pygame, pygame.mixer
+	from pygame.locals import *
+
+	pygame.init()
+	done = False
+	clock = pygame.Clock ()
+	pygame.joystick.init()
+	joystick_count = pygame.joystick.get_count()
+	for i in range (joystick_count):
+		joystick=pygame.joystick.Joystick(i)
+		joystick.init()
+	while done == False:
+		global button_state
+		for event in pygame.event.get()
+			if event.type == pygame.JOYBUTTONDOWN:
+				if event.button ==0:
+					button_state+=1
+				if event.button ==2:
+					button_state+=1
 
 def gen_header():
 	global cont_gen
@@ -182,7 +203,9 @@ else: # real robots
 #	rospy.Subscriber("robot_0/mobile_base/events/button", String, get_button)
 	psound = rospy.Publisher("/robot_0/mobile_base/commands/sound", Sound)
 
-
+#invoca a thread
+tbotoes = Thread (target=handle_joystick, [])
+tbotoes.start()
 r = rospy.Rate(RATE) # 5hz
 
 print "Iniciado o follower"
