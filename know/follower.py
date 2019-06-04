@@ -47,7 +47,7 @@ RATE = 10
 
 #real turtlebot
 MAX_LIN = 0.15
-MAX_ANG = 0.85
+MAX_ANG = 0.95
 #simulated  turtlebot
 #MAX_LIN = 0.6
 #MAX_ANG = 0.5
@@ -59,7 +59,7 @@ distance = None
 global angle
 angle = 0
 #the minimal distance from the target
-MIN_DIST = 70
+MIN_DIST = 55
 #it will follow objects in this gap Min|Max
 MAX_DIST = 200
 global cont
@@ -84,7 +84,7 @@ def handle_joy():
 
 	pygame.init()
 	done = False
-	clock = pygame.Clock ()
+#	clock = pygame.clock ()
 	pygame.joystick.init()
 	joystick_count = pygame.joystick.get_count()
 	for i in range (joystick_count):
@@ -92,7 +92,7 @@ def handle_joy():
 		joystick.init()
 	while done == False:
 		global button_state
-		for event in pygame.event.get()
+		for event in pygame.event.get():
 			if event.type == pygame.JOYBUTTONDOWN:
 				if event.button ==0:
 					button_state+=1
@@ -160,8 +160,10 @@ def get_pos(odom):
 	global posicao
 	global posicao_cont
 	posicao_cont +=1
-	if posicao_cont>40:
+	if posicao_cont>100:
 		posicao_cont = 0
+		x, y, z = getxy(odom)
+		print str (x) + str (y) + str(z)
 		posicao.append(getxy(odom))
 
 def getDegreesFromOdom(w):
@@ -204,8 +206,9 @@ else: # real robots
 	psound = rospy.Publisher("/robot_0/mobile_base/commands/sound", Sound)
 
 #invoca a thread
-tbotoes = Thread (target=handle_joystick, [])
-tbotoes.start()
+#from threading import Thread
+#tbotoes = Thread (target=handle_joy,args=[])
+#tbotoes.start()
 r = rospy.Rate(RATE) # 5hz
 
 print "Iniciado o follower"

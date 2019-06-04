@@ -117,6 +117,7 @@ class Subconcious:
 	def main(self):
 		'''Here is the main loop, a brain never stops '''
 		cont = 0
+		deu_share = False
 		while not rospy.is_shutdown():
 			cont += 1
 			if not self.working:
@@ -124,9 +125,11 @@ class Subconcious:
 					if not box:
 						self.run("follower")
 					else:
-						print "entrou"
-						self.learn_from_file()
-						self.share_knowledge ("generated1")
+						if deu_share == False:
+							deu_share = True
+							print "entrou"
+							self.learn_from_file()
+							self.share_knowledge ("generated1")
 				elif (self.rule == 2):
 					self.run ("generated1")
 				elif (self.rule==3):
